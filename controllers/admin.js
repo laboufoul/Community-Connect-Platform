@@ -45,12 +45,12 @@ module.exports.postLogin = async (req, res) => {
 module.exports.addDescription = async (req, res) => {
 	let { group_id, description } = req.body;
 
-	let group = await Group.findByName(group_name);
+	let group = await Group.findByName(group_id);
 	group.group_desc = description;
 	await group.save();
 
 	req.flash('memberMessage', 'Group saved successfully');
-	return res.redirect(`/admin/group/${group_name}`);
+	return res.redirect(`/admin/group/${group_id}`);
 };
 
 // Get admin dashboard
@@ -76,7 +76,7 @@ module.exports.getDashboard = async (req, res, next) => {
 		if (allGroups.length == 0) callback();
 		allGroups.forEach(async (group, index, array) => {
 			let group_users = await User.find({
-				group_name: { $in: [group.group_name] },
+				group_id: { $in: [group.group_id] },
 			}).exec();
 
 			groups.push({ ...group._doc, members: group_users });
@@ -119,9 +119,9 @@ module.exports.postAddGroup = async (req, res, next) => {
 	var itemsProcessed = 0;
 	members.forEach(async (member, index, array) => {
 		let currentUser = await User.findById(member.id);
-		let groups = currentUser.group_name;
-		groups.push(group.group_name);
-		currentUser.group_name = groups;
+		let groups = currentUser.group_id;
+		groups.push(group.group_id);
+		currentUser.group_id = groups;
 		await currentUser.save();
 		itemsProcessed++;
 		if (itemsProcessed == array.length) {
@@ -137,7 +137,7 @@ module.exports.postAddGroup = async (req, res, next) => {
 
 // Get single group
 module.exports.getGroup = async (req, res, next) => {
-	let group_name = req.params.name;
+	let id = req.params.id;
 	try {
 		let users = await User.find({
 			isAdmin: false,
@@ -145,9 +145,9 @@ module.exports.getGroup = async (req, res, next) => {
 		let allusers = await User.find({
 			isAdmin: false,
 		});
-		let group = await Group.findByID(id);
+		let group = await Group.findById(id);
 		let group_members = await User.find({
-			group_name: { $in: [group.group_name] },
+			group_id: { $in: [group.group_id] },
 		}).exec();
 
 		group_members.map((member) => {
@@ -190,16 +190,16 @@ module.exports.getGroup = async (req, res, next) => {
 
 // Get all group member inside group
 module.exports.addGroupMember = async (req, res, next) => {
-	let { group_name, members } = req.body;
+	let { group_id, members } = req.body;
 	members = JSON.parse(members);
-	let group = await Group.findByName(group_name);
+	let group = await Group.findById(group_id);
 	var itemsProcessed = 0;
 
 	members.forEach(async (member, index, array) => {
 		let currentUser = await User.findById(member.id);
-		let groups = currentUser.group_name;
-		groups.push(group.group_name);
-		currentUser.group_name = groups;
+		let groups = currentUser.group_id;
+		groups.push(group.group_id);
+		currentUser.group_id = groups;
 		await currentUser.save();
 
 		itemsProcessed++;
@@ -216,13 +216,13 @@ module.exports.addGroupMember = async (req, res, next) => {
 
 // Delete single group
 module.exports.postGroupDelete = async (req, res, next) => {
-	let groupName = req.body.group_name;
+	let groupId = req.body.group_id;
 	let group;
 	try {
 		group = await Group.findById(groupId);
 		var itemsProcessed = 0;
 		let group_members = await User.find({
-			group_name: { $in: [group.group_name] },
+			group_id: { $in: [group.group_id] },
 		}).exec();
 
 		if (group_members.length == 0) {
@@ -235,10 +235,10 @@ module.exports.postGroupDelete = async (req, res, next) => {
 		}
 		if (group_members.length > 0) {
 			group_members.forEach(async (member, index, array) => {
-				let groups = member.group_name.filter(
-					(grp) => grp != group.group_name
+				let groups = member.group_id.filter(
+					(grp) => grp != group.group_id
 				);
-				member.group_name = groups;
+				member.group_id = groups;
 				await member.save();
 				itemsProcessed++;
 				if (itemsProcessed == array.length) {
@@ -260,9 +260,9 @@ module.exports.postGroupDelete = async (req, res, next) => {
 };
 // Delete single group member
 module.exports.postGroupMemberDelete = async (req, res, next) => {
-	let { member_id, group_name } = req.body;
+	let { member_id, group_id } = req.body;
 	try {
-		let group = await Group.findByName(group_name);
+		let group = await Group.findById(group_id);
 		let user = await User.findById(member_id);
 		let userGroups = user.group_id.filter((grp) => grp != group.group_id);
 
