@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.methods.getUserGroupMembers = async (currentUserID, cb) => {
 	let currentUser = await mongoose.model('user').findById(currentUserID);
-	let userGroups = currentUser.group_id;
+	let userGroups = currentUser.group_name;
 
 	let notificationUsers = [];
 	let groups = [];
@@ -59,12 +59,12 @@ userSchema.methods.getUserGroupMembers = async (currentUserID, cb) => {
 		userGroups.forEach(async (userGroup, index, array) => {
 			let group = await mongoose
 				.model('Group')
-				.findOne({ group_id: userGroup });
+				.findOne({ group_name: userGroup });
 			if (group) groups.push(group.group_name);
 			let group_users = await mongoose
 				.model('user')
 				.find({
-					group_id: { $in: [group.group_id] },
+					group_name: { $in: [group.group_name] },
 					user_id: { $ne: currentUser.user_id },
 				})
 				.exec();
