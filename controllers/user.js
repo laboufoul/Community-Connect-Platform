@@ -140,7 +140,7 @@ function getAllConnectionInformation() {
 		let allConnections = [];
 		let itemsProcessed = 0;
 		const user = await User.findById(currentUserID);
-		let group_ids = user.group_id;
+		let group_ids = user.group_name;
 
 		group_ids.forEach(async (group_id, index, array) => {
 			let group_users = await User.find({
