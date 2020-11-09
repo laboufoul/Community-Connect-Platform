@@ -218,7 +218,7 @@ const createUsers = () => {
 		userGroups.forEach(async (userGroup, index, array) => {
 			foundGroup = await Group.findOne({ group_name: userGroup.trim() });
 			if (foundGroup) {
-				arrGr.push(foundGroup.group_name);
+				arrGr.push(foundGroup.group_id);
 				userGroupIndex++;
 				if (array.length == userGroupIndex) isUserDone(user, arrGr);
 			}
