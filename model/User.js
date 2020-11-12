@@ -64,7 +64,7 @@ userSchema.methods.getUserGroupMembers = async (currentUserID, cb) => {
 			let group_users = await mongoose
 				.model('user')
 				.find({
-					group_id: { $in: [group.group_id] },
+					group_id: { $in: [group.group_name] },
 					user_id: { $ne: currentUser.user_id },
 				})
 				.exec();
