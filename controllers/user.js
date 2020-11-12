@@ -266,6 +266,7 @@ module.exports.getFeeds = async (req, res, next, path = null) => {
 			connection: user.connection,
 			image_src: user.profile_pic,
 			user_id: user.user_id,
+			group_name: user.group_id,
 		};
 		currentUserID = user._id;
 
